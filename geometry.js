@@ -12,7 +12,7 @@ exports.getDistance = function getDistance(a, b) {
   var latb = toRadians(b.lat);         
   var x = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lata) * Math.cos(latb);
   var y = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));        
-  return 6371000 * y;
+  return 6371000 * y; // In metres
 
 }
 

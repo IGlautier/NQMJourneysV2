@@ -1,0 +1,34 @@
+extends layout
+
+block rightNavMenu
+  li
+    a(href='#')
+      i.material-icons.left settings
+      |settings
+  li
+    a(href='/logout')
+      i.material-icons.left exit_to_app
+      |logout
+
+block rightNavMenuMobile
+  li
+    a(href='#')
+      i.material-icons.left settings
+      |settings
+    a(href='/logout')
+      i.material-icons.left exit_to_app
+      |logout
+
+block content
+  div.row
+    div#vehicle-list.col.s3
+    div.col.s3
+      div#journeyPicker.collection
+    div#map.col.s5(style='height: 400px;')
+      div#details
+
+  script(src='javascripts/leaflet.js')
+  script(type="text/javascript").
+    var _fleet = !{JSON.stringify(fleet)};
+  script(src='javascripts/journeys.js')
+  link(rel='stylesheet', href='/stylesheets/leaflet.css')

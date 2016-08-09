@@ -1,8 +1,8 @@
 var exports = module.exports = {};
-var data = require('./data/data1.json');
 var _geometry = require('./geometry.js');
-
-var a = data.shift();
+var _journeySimplifier = require('./journeySimplifier.js');
+var data;
+var a; 
 var journey = {};
 journey.points = [];
 journey.time = 0;
@@ -36,15 +36,23 @@ function createSection(b, cb) {
   cb();
 }
 
-exports.analyse = function analyse(cb) {
+function createJourney(cb) {
   if (data[0]) {
       createSection(data.shift(), function(){
-        analyse(cb);
+        createJourney(cb);
       })
   }
   else {
     if (journey.points.length > 0) journeys.push(JSON.parse(JSON.stringify(journey)));
-    cb(journeys);
+    _journeySimplifier.simplify(journeys, cb);
+   // cb(journeys);
 
   }
+
+}
+
+exports.analyse = function(raw, cb) {
+  if (!a) a = raw.shift();
+  data = raw;
+  createJourney(cb);
 }
