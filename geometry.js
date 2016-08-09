@@ -4,7 +4,7 @@ function toRadians(x) {
   return x * Math.PI / 180;
 }
 
-function getDistance(a, b) {
+exports.getDistance = function getDistance(a, b) {
              
   var dLat = toRadians(a.lat - b.lat);
   var dLon = toRadians(a.lon - b.lon);
@@ -17,7 +17,7 @@ function getDistance(a, b) {
 }
 
 exports.getSpeed = function getSpeed(a, b) {
-  var dist = getDistance(a,b);
+  var dist = exports.getDistance(a,b);
   var time = (a.timestamp - b.timestamp)/(60*60*1000);
   var speed = Math.abs(dist/time)/1000;
   return speed * 5/8;

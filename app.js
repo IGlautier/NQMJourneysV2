@@ -27,10 +27,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 
-app.get('/blob', function(req, res) {
-  _journeyAnalyser.analyse();
-  console.log('hi');
-  res.render('index');
+app.get('/analyse', function(req, res) {
+  _journeyAnalyser.analyse(function(data) {
+    res.render('index', {journeys: data});
+  });
+  
 });
 
 // catch 404 and forward to error handler

@@ -7,4 +7,19 @@ html
     script(src='https://code.jquery.com/jquery-2.1.1.min.js')
     script(src='javascripts/materialize.min.js')
   body
+    .navbar-fixed
+      nav.teal.lighten-2
+        .nav-wrapper
+          a.brand-logo(href='#!') &nbsp;NquiringMinds Fleet Management
+            a.button-collapse(href='#', data-activates='mobile-menu') 
+              i.material-icons menu
+            ul.right
+              block staticNavMenu
+            ul.right.hide-on-med-and-down
+              //- Allow page-specific navbar options
+              block rightNavMenu
+            ul.side-nav#mobile-menu
+              //- Allow page-specific navbar options
+              block rightNavMenuMobile
+    .row
     block content
