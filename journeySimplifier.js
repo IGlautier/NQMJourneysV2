@@ -1,5 +1,4 @@
 var exports = module.exports = {};
-var minArea = 10000;
 
 Array.min = function( array ){
     return Math.min.apply( Math, array );
@@ -32,12 +31,19 @@ function area (a, b, c) {
   return area;
 }
 
-function removePoints(points) {
-  var areas;
-  var min = minArea - 1;
+function getMinArea(journey) {
+  var speed = journey.distance/(journey.time/1000);
+  var avgTime = (journey.time/1000)/journey.points.length;
+  var lenA = speed * avgTime;
+  return lenA * lenA * 0.5;
+}
 
-  while (min < minArea) {
-    //console.log(areas);
+function removePoints(points, minArea) {
+  var areas;
+  console.log(minArea);
+  var min = minArea - 1;
+  while (min < minArea && points.length > 2) {
+   // console.log(min);
     areas = [];
     for (var i = 1; i < points.length - 1; i++) {     
       areas.push(area(points[i-1], points[i], points[i+1]));
@@ -53,10 +59,11 @@ function removePoints(points) {
 
 exports.simplify = function(journeys, cb) {
   for (var i = 0; i < journeys.length; i++) {
-   console.log(journeys[i].points.length);
-    removePoints(journeys[i].points);
-   console.log(journeys[i].points.length);
+    console.log(journeys[i].points.length);
+    removePoints(journeys[i].points, getMinArea(journeys[i]));
+    console.log(journeys[i].points.length);
   }
+  
   cb(journeys);
 
 }
