@@ -4,6 +4,21 @@ var marker;
 var popup;
 var xhttp = new XMLHttpRequest();
 
+function createFence(e) {
+  console.log(e);
+  var radius = document.getElementById('fence-size').value;
+  var circle = L.circle(e.latlng, radius, {
+      color: 'blue',
+      fillColor: '#9966ff',
+      fillOpacity: 0.2
+  }).addTo(map);
+
+  var fence = {'centre':[10, 10], 'size': radius, 'vehicles':[]};
+    
+    xhttp.open('GET', '/createGeofence?fence=' + JSON.stringify(fence), true);
+    xhttp.send();
+}
+
 function drawJourney(vehicle, jNum) {
   // create a red polyline from an array of LatLng points
   var list = menu.childNodes;
@@ -18,9 +33,6 @@ function drawJourney(vehicle, jNum) {
   // zoom the map to the polyline
   map.fitBounds(polyline.getBounds());
   var hours = journey.time/(60*60*1000);
-  var speed = (journey.distance/1609.34)/hours;
-  var details = 'Journey Time (minutes): ' + hours*60 + ' | Average speed (mph): ' + speed + ' | Total Distance (miles): ' + journey.distance/1609.34;
-  document.getElementById('details').innerText = details; 
   if (popup) map.removeLayer(popup);
   popup = L.popup();
   var len = journey.points.length - 1;
@@ -32,14 +44,19 @@ function drawJourney(vehicle, jNum) {
 function locateOnMap(n) {
 
   if (marker) map.removeLayer(marker);
-  var journey = _fleet[n].journeys[_fleet[n].journeys.length - 1];
-  marker = L.marker([journey.points[journey.points.length - 1][0], journey.points[journey.points.length - 1][1]]);
-  map.addLayer(marker);
-  map.setView([journey.points[journey.points.length - 1][0], journey.points[journey.points.length - 1][1]], 13);
+  if (_fleet[n].journeys.length > 0) {
+    var journey = _fleet[n].journeys[_fleet[n].journeys.length - 1];
+    marker = L.marker([journey.points[journey.points.length - 1][0], journey.points[journey.points.length - 1][1]]);
+    map.addLayer(marker);
+    map.setView([journey.points[journey.points.length - 1][0], journey.points[journey.points.length - 1][1]], 13);
+  }
 }
 
 function showJourneys(n) {
-  menu.innerHTML = '';
+
+  while (menu.firstChild) {
+    menu.removeChild(menu.firstChild);
+  }
   for (var i = 0; i < _fleet[n].journeys.length; i++) {
     
     var jLink = document.createElement('a');
@@ -47,6 +64,17 @@ function showJourneys(n) {
     jLink.className += 'collection-item';
     jLink.innerText = 'Journey ' + i;
     jLink.setAttribute('onclick', 'drawJourney(' + n + ', ' + i + ')');
+    var hours = _fleet[n].journeys[i].time/(60*60*1000);
+    var speed = (_fleet[n].journeys[i].distance/1609.34)/hours;
+    var mphChip = document.createElement('div');
+    mphChip.className += 'chip';
+    mphChip.innerText = Math.floor(speed) + ' mph';
+    var distChip = document.createElement('div');
+    distChip.className += 'chip';
+    distChip.style.marginLeft = '8px';
+    distChip.innerText = Math.floor(_fleet[n].journeys[i].distance/1609.34) + ' miles';
+    jLink.appendChild(distChip);
+    jLink.appendChild(mphChip);
     menu.appendChild(jLink);
   }
 
@@ -82,6 +110,7 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     accessToken: 'pk.eyJ1IjoibnFtaXZhbiIsImEiOiJjaXJsendoMHMwMDM3aGtuaGh2bWt5OXRvIn0.6iCk2i96NUucsyDlbnVtiA'
 }).addTo(map);
 
+map.on('click', createFence);
 
 for (var i = 0; i < _fleet.length; i++) {
   var vehicle = document.createElement('div');
@@ -99,4 +128,5 @@ for (var i = 0; i < _fleet.length; i++) {
   vehicleAction.appendChild(vehicleLink);
   vehicle.appendChild(vehicleAction);
   document.getElementById('vehicle-list').appendChild(vehicle);
+ 
 }

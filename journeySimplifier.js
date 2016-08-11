@@ -27,7 +27,6 @@ function area (a, b, c) {
   var lenCA = getDistance(c, a);
   var s = (lenAB + lenBC + lenCA)/2;
   var area = Math.sqrt(s*((s-lenAB)*(s-lenBC)*(s-lenCA)));
- // console.log(area);
   return area;
 }
 
@@ -40,10 +39,8 @@ function getMinArea(journey) {
 
 function removePoints(points, minArea) {
   var areas;
-  console.log(minArea);
   var min = minArea - 1;
   while (min < minArea && points.length > 2) {
-   // console.log(min);
     areas = [];
     for (var i = 1; i < points.length - 1; i++) {     
       areas.push(area(points[i-1], points[i], points[i+1]));
@@ -58,10 +55,10 @@ function removePoints(points, minArea) {
 }
 
 exports.simplify = function(journeys, cb) {
-  for (var i = 0; i < journeys.length; i++) {
-    console.log(journeys[i].points.length);
+
+  
+  for (var i = 0; i < journeys.length; i++) {   
     removePoints(journeys[i].points, getMinArea(journeys[i]));
-    console.log(journeys[i].points.length);
   }
   
   cb(journeys);

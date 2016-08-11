@@ -45,13 +45,17 @@ function createJourney(cb) {
   else {
     if (journey.points.length > 0) journeys.push(JSON.parse(JSON.stringify(journey)));
     _journeySimplifier.simplify(journeys, cb);
-   // cb(journeys);
 
   }
 
 }
 
 exports.analyse = function(raw, cb) {
+  journey = {};
+  journey.points = [];
+  journey.time = 0;
+  journey.distance = 0;
+  journeys = [];
   if (!a) a = raw.shift();
   data = raw;
   createJourney(cb);

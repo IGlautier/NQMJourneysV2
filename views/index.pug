@@ -22,10 +22,13 @@ block rightNavMenuMobile
 block content
   div.row
     div#vehicle-list.col.s3
-    div.col.s3
+    div.col.s2
       div#journeyPicker.collection
-    div#map.col.s5(style='height: 400px;')
-      div#details
+    div.col.s5
+      div#map(style='height: 400px;')
+      form(action='#')
+        p.range-field
+          input(type='range', id='fence-size', min='10', max='100000')
 
   script(src='javascripts/leaflet.js')
   script(type="text/javascript").
