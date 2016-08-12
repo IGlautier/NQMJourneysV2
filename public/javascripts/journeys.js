@@ -5,6 +5,24 @@ var fences;
 var popup;
 var xhttp = new XMLHttpRequest();
 
+
+function toRadians(x) {
+  return x * Math.PI / 180;
+}
+
+function getDistance(a, b) {
+             
+  var dLat = toRadians(a[0] - b[0]);
+  var dLon = toRadians(a[1] - b[1]);
+  var lata = toRadians(a[0]);
+  var latb = toRadians(b[0]);         
+  var x = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lata) * Math.cos(latb);
+  var y = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));        
+  return 6371000 * y; // In metres
+
+}
+
+
 function deleteFence(id) {
   xhttp.open('GET', '/deleteGeofence?fence=' + id, true);
   xhttp.send();
@@ -25,7 +43,9 @@ function createFence(e) {
   var vehicleIds = [];
   var vehiclesToAdd = document.getElementsByTagName('input');
   for (var i = 0; i < vehiclesToAdd.length; i++) {
-    if (vehiclesToAdd[i].checked) vehicleIds.push(vehiclesToAdd[i].parentNode.parentNode.parentNode.id);
+    if (vehiclesToAdd[i].checked) {
+      vehicleIds.push(_fleet[vehiclesToAdd[i].id]);
+    }
   }
   
 
@@ -67,10 +87,20 @@ function locateOnMap(n) {
   if (marker) map.removeLayer(marker);
   if (_fleet[n].journeys.length > 0) {
     var journey = _fleet[n].journeys[_fleet[n].journeys.length - 1];
-    marker = L.marker([journey.points[journey.points.length - 1][0], journey.points[journey.points.length - 1][1]]);
+    var location = [journey.points[journey.points.length - 1][0], journey.points[journey.points.length - 1][1]];
+    marker = L.marker(location);
     map.addLayer(marker);
     map.setView([journey.points[journey.points.length - 1][0], journey.points[journey.points.length - 1][1]], 13);
+
+    for (var i = 0; i < fences.length; i++) {
+      for(var j = 0; j < fences[i].vehicles.length; j++) {
+        if (fences[i].vehicles[j].id == _fleet[n].id) {
+          if (getDistance(fences[i].centre, location) > fences[i].size) alert(_fleet[n].name + ' has breached geofence ' +  fences[i].id);
+        }
+      }
+    }
   }
+  
 }
 
 function showJourneys(n) {
@@ -144,7 +174,7 @@ function addFence(newFence) {
   var fenceInner = document.createElement('div');
   fenceInner.className += 'card-content white-text';
   fenceInner.innerText = 'Fence Name: ' + newFence.id + ', Applies To: ';
-  for (var i = 0; i < newFence.vehicles.length; i++)  fenceInner.innerText += newFence.vehicles[i] + ' ';
+  for (var i = 0; i < newFence.vehicles.length; i++)  fenceInner.innerText += newFence.vehicles[i].name + ' ';
   fence.appendChild(fenceInner);
   var fenceAction = document.createElement('div');
   fenceAction.className += 'card-action';
@@ -192,10 +222,10 @@ for (var i = 0; i < _fleet.length; i++) {
   checkbox.action = '#';
   var checkboxInput = document.createElement('input');
   checkboxInput.type = 'checkbox';
-  checkboxInput.id = 'check' + i;
+  checkboxInput.id = i;
   checkbox.appendChild(checkboxInput);
   var checkboxLabel = document.createElement('label');
-  checkboxLabel.setAttribute('for', 'check' + i);
+  checkboxLabel.setAttribute('for', i);
   checkboxLabel.innerText = 'New Geofence';
   checkbox.appendChild(checkboxLabel);
  
