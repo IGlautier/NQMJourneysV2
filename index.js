@@ -10,6 +10,7 @@ var _fleetManager = require('./fleetManager.js');
 var _journeyManager = require('./journeyManager.js');
 var _fenceBuilder = require('./fenceBuilder.js');
 var _fenceManager = require('./fenceManager.js');
+var _locationManager = require('./locationManager.js');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: 'blahblahblah', resave: true, saveUninitialized: true })); 
@@ -53,7 +54,14 @@ app.get('/deleteGeofence', ensureAuthenticated, function(req, res) {
 
 
 app.get('/geofences', ensureAuthenticated, function(req, res) {
-  _fenceManager.getFences(req.session.token, function(data) {
+  _fenceManager.getFences(function(data) {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(data));
+  });
+});
+
+app.get('/location', ensureAuthenticated, function(req, res) {
+  _locationManager.currentLocation(req.query.id, function(data) {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(data));
   });

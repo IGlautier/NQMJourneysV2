@@ -3,6 +3,8 @@ var polyline;
 var marker;
 var fences;
 var popup;
+var tracker;
+var currentVehicle;
 
 function drawJourney(vehicle, jNum) {
   // create a red polyline from an array of LatLng points
@@ -26,24 +28,30 @@ function drawJourney(vehicle, jNum) {
   map.addLayer(popup);
 }
 
-function locateOnMap(n) {
+function locateOnMap() {
 
   if (marker) map.removeLayer(marker);
-  if (_fleet[n].journeys.length > 0) {
-    var journey = _fleet[n].journeys[_fleet[n].journeys.length - 1];
-    var location = [journey.points[journey.points.length - 1][0], journey.points[journey.points.length - 1][1]];
-    marker = L.marker(location);
-    map.addLayer(marker);
-    map.setView([journey.points[journey.points.length - 1][0], journey.points[journey.points.length - 1][1]], 13);
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+      var current = JSON.parse(xhttp.responseText);
+      if (current) {
+        marker = L.marker(current[0]);
+        map.addLayer(marker);
+        map.setView(current[0], 13);
 
-    for (var i = 0; i < fences.length; i++) {
-      for(var j = 0; j < fences[i].vehicles.length; j++) {
-        if (fences[i].vehicles[j].id == _fleet[n].id) {
-          if (getDistance(fences[i].centre, location) > fences[i].size) alert(_fleet[n].name + ' has breached geofence ' +  fences[i].id);
+        for (var i = 0; i < fences.length; i++) {
+          for(var j = 0; j < fences[i].vehicles.length; j++) {
+            if (fences[i].vehicles[j].id == _fleet[currentVehicle].id) {
+              if (getDistance(fences[i].centre, [current[0].lat, current[0].lon]) > fences[i].size) alert(_fleet[currentVehicle].name + ' has breached geofence ' +  fences[i].id);
+            }
+          }
         }
       }
     }
-  }
+  };
+  xhttp.open('GET', '/location?id=' + _fleet[currentVehicle].id, true);
+  xhttp.send();  
   
 }
 
@@ -76,12 +84,15 @@ function showJourneys(n) {
 }
 
 function getInfo(n) {
+  currentVehicle = n;
   if (!_fleet[n].journeys) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
     if (xhttp.readyState == 4 && xhttp.status == 200) {
         _fleet[n].journeys = JSON.parse(xhttp.responseText);
-        locateOnMap(n);
+        clearInterval(tracker);
+        tracker = setInterval(locateOnMap, 30000);
+        locateOnMap();
         showJourneys(n);
       }
     };
@@ -89,9 +100,12 @@ function getInfo(n) {
     xhttp.send();
   }
   else {
-    locateOnMap(n);
+    clearInterval(tracker);
+    tracker = setInterval(locateOnMap, 30000);
+    locateOnMap();
     showJourneys(n);
   }
+  
 }
 
 var map = L.map('map', {

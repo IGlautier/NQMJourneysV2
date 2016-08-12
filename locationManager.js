@@ -1,9 +1,8 @@
 var exports = module.exports = {};
 var https = require('https');
 
-
-exports.getFences = function(cb) {
-  var url = 'https://q.nqminds.com/v1/datasets/r1xKhjx5Y/data';
+exports.currentLocation = function(id, cb) {
+  var url = 'https://q.nqminds.com/v1/datasets/' + id + '/data?opts={"limit":1,"sort":{"timestamp":-1}}';
   https.get(url, function(res) {
     var body = '';
 
