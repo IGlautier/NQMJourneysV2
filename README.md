@@ -1,23 +1,12 @@
-# nqm-app-minimal
-minimal nqm app with tdx authentication
+# nqm fleet manager
+Asset tracking and journey analysis
 
 ## usage
-Use the ensureAuthenticated middleware helper on any route that requires protection. 
+npm install
+node index.js
 
-### Sensitive data
-Require authentication before showing sensitive page.
+accessible at localhost:8084
 
-```
-app.get("/secretData", ensureAuthenticated, function(req, res) {
-  res.render("secretDataView");
-});
-```
+Press locate on map on a vehicle to see the last location, this will auto-update every 30 seconds.
 
-### Public
-Don't care about authentication for public views, so omit ensureAuthenticated middleware.
-
-```
-app.get("/publicData", function(req, res) {
-  res.render("publicDataView");
-});
-```
+Geofencing: Select vehicles from the left pane to apply geo fence to, set radius with slider below map and then click on the map to add as a geofence. Alerts will pop on the page if the vehicle you are currently monitoring location for is outside of this geofence.
