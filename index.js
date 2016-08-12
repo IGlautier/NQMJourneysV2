@@ -9,6 +9,7 @@ var session = require('express-session');
 var _fleetManager = require('./fleetManager.js');
 var _journeyManager = require('./journeyManager.js');
 var _fenceBuilder = require('./fenceBuilder.js');
+var _fenceManager = require('./fenceManager.js');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: 'blahblahblah', resave: true, saveUninitialized: true })); 
@@ -39,13 +40,23 @@ app.get('/journeys', ensureAuthenticated, function(req, res){
 });
 
 app.get('/createGeofence', ensureAuthenticated, function(req, res) {
-  _fenceBuilder.build(req.session.token, req.query.fence, function(rCode) {
-    res.sendStatus(rCode);
+  _fenceBuilder.build(req.session.token, req.query.fence, function(id) {
+    res.send(id);
+  });
+});
+
+app.get('/deleteGeofence', ensureAuthenticated, function(req, res) {
+  _fenceBuilder.destroy(req.session.token, req.query.fence, function(rCode) {
+    res.status(rCode);
   })
 });
 
-app.get('/geofences', ensureAuthenticated, function(req, res) {
 
+app.get('/geofences', ensureAuthenticated, function(req, res) {
+  _fenceManager.getFences(req.session.token, function(data) {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(data));
+  });
 });
 
 // Render login page, which will redirect to the TDX auth server with a return URL to our /authCB route.

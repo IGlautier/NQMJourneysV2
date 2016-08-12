@@ -4,7 +4,6 @@ Array.min = function( array ){
     return Math.min.apply( Math, array );
 };
 
-
 function toRadians(x) {
   return x * Math.PI / 180;
 }
@@ -46,21 +45,15 @@ function removePoints(points, minArea) {
       areas.push(area(points[i-1], points[i], points[i+1]));
     } 
     min = Array.min(areas);
-    points.splice(areas.indexOf(min)+1, 1);
-
-    
+    points.splice(areas.indexOf(min)+1, 1); 
   }
-
-  
 }
 
 exports.simplify = function(journeys, cb) {
 
-  
   for (var i = 0; i < journeys.length; i++) {   
     removePoints(journeys[i].points, getMinArea(journeys[i]));
   }
-  
   cb(journeys);
 
 }
