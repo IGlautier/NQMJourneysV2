@@ -28,11 +28,13 @@ block content
       div#map(style='height: 400px;')
       form(action='#')
         p.range-field
-          input(type='range', id='fence-size', min='10', max='100000')
+          input(type='range', id='fence-size', min='10', max='1000')
       div#fences
 
   script(src='javascripts/leaflet.js')
   script(type="text/javascript").
     var _fleet = !{JSON.stringify(fleet)};
+  script(src='javascripts/geometry.js')
+  script(src='javascripts/fences.js')
   script(src='javascripts/journeys.js')
   link(rel='stylesheet', href='/stylesheets/leaflet.css')
